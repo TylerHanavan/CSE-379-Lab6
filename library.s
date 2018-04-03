@@ -10,6 +10,11 @@
 	EXPORT clear_display
 	EXPORT change_display
 
+	EXPORT change_display_digit
+	EXPORT get_digit
+
+	EXPORT from_ascii
+
 test = "test1",0
 	ALIGN
 		
@@ -71,64 +76,177 @@ setup_pins
 	BX lr 
 
 validate_input					;checks that the inputted value (r0) is either hexadecimal or 'q'
-	STMFD SP!, {lr}				;returns output as boolean in (r4)
+	STMFD SP!, {lr, r1, r2, r3}		;returns output as boolean in (r4)
 
 	CMP r0, #0x71				;'q'
 	BEQ quit
 
-	;CMP r9, #1 
-	;BNE vi_exit_false			;Not accepting input at this time	
+	CMP r9, #0				;not accepting input (bar 'q') when display is off
+	BEQ vi_invalid		
 
-	CMP r0, #0x30				;Less than 0x30, invalid input
-	BLT vi_exit_false
+	CMP r0, #0x30				;<0x30 invalid
+	BLT vi_invalid
 
-	CMP r0, #0x46				;Greater than 0x46, invalid input
-	BGT vi_exit_false
+	CMP r0, #0x66				;>0x66 invalid
+	BGT vi_invalid
 
-	CMP r0, #0x39				;Less than equal 0x39, valid input
-	BLE vi_exit_true_num	
+	CMP r0, #0x39				;<=0x39 valid number
+	BLE vi_valid_number
 	
-	CMP r0, #0x41				;Greater than equal 0x41, valid input
-	BGE vi_exit_true_let
+	CMP r0, #0x61				;>=0x61 valid uppercase letter
+	BGE vi_valid_letter_upper
 
-	B vi_exit_false
-
-vi_exit_true_let					;change display and return 0x1 in r4
-
-	MOV r4, #0x1
+	CMP r0, #0x46				;>0x46 invalid
+	BGT vi_invalid
 	
-	SUB r0, r0, #0x41
-	ADD r0, r0, #10
+	CMP r0, #0x41				;>=0x41 valid uppercase letter
+	BGE vi_valid_letter_upper
 	
-	BL clear_display
+vi_valid_number
 
-	BL change_display
-	;LDR r4, =test
-	;BL output_string
-
-	B vi_exit
-	
-vi_exit_true_num					;change display and return 0x1 in r4
-
-	MOV r4, #0x1
-	
-	SUB r0, r0, #0x30
-	
-	BL clear_display
-
-	BL change_display
-	;LDR r4, =test
-	;BL output_string
+	MOV r4, #1				;return 1 for r4
 
 	B vi_exit
 
-vi_exit_false					;don't change display. return 0x0 in r4
+vi_valid_letter_lower
+
+	MOV r4, #1				;return 1 for r4
+
+	B vi_exit
+
+vi_valid_letter_upper
+
+	MOV r4, #1				;return 1 for r4
 	
-	MOV r4, #0x0				
+	B vi_exit
+
+vi_invalid
+
+	MOV r4, #0				;return 0 for r4
 
 vi_exit
 
-	LDMFD SP!, {lr}
+	LDMFD SP!, {lr, r1, r2, r3}
+	BX lr
+
+get_digit					; returns (in r4) the hexadecimal number's (globally at r8) digit r0
+						; last-most digit is 0, first-most digit is n where n is number of steps needed to get to said digit
+						
+	STMFD SP!, {lr, r1, r2, r3}
+
+	MOV r1, #0xF
+	MOV r2, r8
+	MOV r3, #0
+
+	CMP r0, #0
+	BEQ get_digit_0
+
+	CMP r0, #1
+	BEQ get_digit_1
+
+	CMP r0, #2
+	BEQ get_digit_2
+
+	CMP r0, #3
+	BEQ get_digit_3
+
+get_digit_0
+	
+	AND r2, r2, r1	
+
+get_digit_0_loop
+	
+	CMP r2, #0
+	BEQ get_digit_end
+
+	ADD r3, r3, #1
+	SUB r2, r2, #1
+	
+	B get_digit_0_loop
+
+
+get_digit_1
+
+	MOV r1, r1, #4
+
+	AND r2, r2, r1
+
+get_digit_1_loop
+
+	CMP r2, #0xF
+	BLE get_digit_end
+
+	ADD r3, r3, #1
+	SUB r2, r2, #0x10
+	
+	B get_digit_0_loop
+
+get_digit_2
+
+	MOV r1, r1, #8
+
+	AND r2, r2, r1
+
+get_digit_2_loop
+
+	CMP r2, #0xFF
+	BLE get_digit_end
+
+	ADD r3, r3, #1
+	SUB r2, r2, #0x100
+
+	B get_digit_2_loop
+
+get_digit_3
+
+	MOV r1, r1, #12
+	
+	AND r2, r2, r1
+
+get_digit_3_loop
+
+	CMP r2, #0xFFF
+	BLE get_digit_end
+
+	ADD r3, r3, #1
+	SUB r2, r2, #0x1000
+
+	B get_digit_3_loop
+
+get_digit_end
+
+	MOV r4, r3
+
+	LDMFD SP!, {lr, r1, r2, r3}
+	BX lr
+
+from_ascii					; converts (singe-digit) number at r0 from ascii number to normal number, returning at r4
+	STMFD SP!, {lr, r1, r2, r3}
+
+	CMP r0, #0x39
+	BLE fa_number
+
+	CMP r0, #0x61
+	BGE fa_lower
+
+	CMP r0, #0x41
+	BGE fa_upper
+
+fa_number
+
+	SUB r4, r0, #0x30
+
+fa_upper
+	
+	SUB r4, r0, #54
+
+fa_lower
+
+	SUB r4, r0, #86
+
+fa_exit
+
+	LDMFD SP!, {lr, r1, r2, r3}
 	BX lr
 
 toggle_seven_seg
@@ -170,6 +288,34 @@ change_display				;Displays hex value passed in r0
 	STR r2, [r1, #4]   		; Display (0x4 = offset to IOSET) 
 
 	LDMFD sp!, {lr, r1, r2, r3}
+	BX lr
+
+change_display_digit			;Displays hex value passed in r0 at digit r4
+	STMFD SP!,{lr, r1, r2, r3, r5}
+	
+	MOV r9, #1
+	MOV r6, r0			; Save our r0 at r6
+	
+	MOV r5, #1			; Initial 1 for selecting which pin to HIGH
+
+	ADD r4, #0x2			; DIGIT SEL IS OFFSET BY 2. BEGINS AT PIN 2. r4 + 2 is pin that gets HIGH'd
+	
+	MOV r5, r5, LSL r4		; Shift initial 1 bit by r4
+
+	MVN r5, r5			; High all bits besides r4 (DIGIT SEL IS OFFSET BY 2. BEGINS AT PIN 2. 0 & 1 RESERVED)
+	;ADD r5, r5, #1
+
+	AND r5, r5, #0x3C		; Clear all bits (AND) besides 6 bits in 0x3C. Will be used in later OR
+
+	LDR r1, =0xE0028000 		; Base address for 7seg
+	LDR r3, =digits_SET 
+	MOV r0, r0, LSL #2 		; Each stored value is 32 bits 
+	ADD r3, r0
+	LDR r2, [r3] 	  		; Load IOSET pattern for digit in r0 
+	ORR r2, r2, r5			; HIGH bits not being used (HIGH-OFF TO CHOOSE DIGIT)
+	STR r2, [r1, #4]   		; Display (0x4 = offset to IOSET) 
+
+	LDMFD sp!, {lr, r1, r2, r3, r5}
 	BX lr
 	
 clear_display
