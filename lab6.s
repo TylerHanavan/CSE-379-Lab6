@@ -46,8 +46,8 @@ lab6
 
 lab6_loop
 
-	CMP r7, #1
-	BEQ lab6_end
+	CMP r7, #5
+	BGE lab6_end
 
 	B lab6_loop
 
@@ -189,8 +189,84 @@ TIMER0
 	ORR r1, r1, #1
 	STR r1, [r0]
 	
-	;r9 contains value to display
+	;r8 contains value to display
 	
+	CMP r7, #0
+	BEQ cycle_1
+
+	CMP r7, #1
+	BEQ cycle_2
+
+	CMP r7, #2
+	BEQ cycle_3
+
+	CMP r7, #3
+	BEQ cycle_4
+
+	B FIQ_Exit
+	
+cycle_1
+
+	BL clear_display
+
+	MOV r0, #0
+        BL get_digit
+
+        MOV r4, r0
+        MOV r0, #0
+
+        BL change_display_digit
+
+	ADD r7, r7, #1
+
+	B FIQ_Exit
+
+cycle_2
+
+	BL clear_display
+
+	MOV r0, #1
+        BL get_digit
+
+        MOV r4, r0
+        MOV r0, #1
+
+        BL change_display_digit
+
+        ADD r7, r7, #1
+
+	B FIQ_Exit
+
+cycle_3
+	
+	BL clear_display
+
+	MOV r0, #2
+        BL get_digit
+
+        MOV r4, r0
+        MOV r0, #2
+
+        BL change_display_digit
+
+        ADD r7, r7, #1
+
+	B FIQ_Exit
+
+cycle_4
+
+	BL clear_display
+
+	MOV r0, #3
+        BL get_digit
+
+        MOV r4, r0
+        MOV r0, #3
+
+        BL change_display_digit
+
+        MOV r7, #0
+
 	B FIQ_Exit
 
 EINT1			; Check for EINT1 interrupt
@@ -252,40 +328,7 @@ key_enter
 
 	MOV r5, #0
 
-	MOV r0, #0
-	BL get_digit
-
-	MOV r4, r0
-	MOV r0, #0
-
-	BL change_display_digit
-
-
-	MOV r0, #1
-	BL get_digit
-
-	MOV r4, r0
-	MOV r0, #1
-
-	BL change_display_digit	
 	
-	
-	MOV r0, #2
-	BL get_digit
-
-	MOV r4, r0
-	MOV r0, #2
-
-	BL change_display_digit
-
-
-	MOV r0, #3
-	BL get_digit
-	
-	MOV r4, r0
-	MOV r0, #3
-	
-	BL change_display_digit
 
 quit_skip
 

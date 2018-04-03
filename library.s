@@ -401,5 +401,5 @@ new_line
 	BX lr	 
 
 quit
-	MOV r7, #1
+	MOV r7, #5
 	END
