@@ -34,11 +34,9 @@ lab6
 	BL interrupt_init
 	BL clear_display
 	
-	MOV r0, #1
+	MOV r9, #0
 	
-	BL change_display
-	
-	MOV r9, #1
+	MOV r8, #2
 
 	LDR r4, =prompt
 
@@ -130,7 +128,7 @@ interrupt_init
 
 		LDR r0, =0xE0004018
 
-		LDR r1, =250000
+		LDR r1, =160000
 
 		STR r1, [r0]
 
@@ -191,6 +189,9 @@ TIMER0
 	
 	;r8 contains value to display
 	
+	CMP r9, #1
+	BNE FIQ_Exit
+	
 	CMP r7, #0
 	BEQ cycle_1
 
@@ -210,12 +211,12 @@ cycle_1
 	BL clear_display
 
 	MOV r0, #0
-        BL get_digit
+	BL get_digit
 
-        MOV r4, r0
-        MOV r0, #0
+	MOV r4, r0
+	MOV r0, #1
 
-        BL change_display_digit
+	BL change_display_digit
 
 	ADD r7, r7, #1
 
@@ -226,14 +227,14 @@ cycle_2
 	BL clear_display
 
 	MOV r0, #1
-        BL get_digit
+	BL get_digit
 
-        MOV r4, r0
-        MOV r0, #1
+	MOV r4, r0
+	MOV r0, #1
 
-        BL change_display_digit
+	BL change_display_digit
 
-        ADD r7, r7, #1
+	ADD r7, r7, #1
 
 	B FIQ_Exit
 
@@ -242,14 +243,14 @@ cycle_3
 	BL clear_display
 
 	MOV r0, #2
-        BL get_digit
+	BL get_digit
 
-        MOV r4, r0
-        MOV r0, #2
+	MOV r4, r0
+	MOV r0, #2
 
-        BL change_display_digit
+	BL change_display_digit
 
-        ADD r7, r7, #1
+	ADD r7, r7, #1
 
 	B FIQ_Exit
 
@@ -258,14 +259,14 @@ cycle_4
 	BL clear_display
 
 	MOV r0, #3
-        BL get_digit
+	BL get_digit
 
-        MOV r4, r0
-        MOV r0, #3
+	MOV r4, r0
+	MOV r0, #3
 
-        BL change_display_digit
+	BL change_display_digit
 
-        MOV r7, #0
+	MOV r7, #0
 
 	B FIQ_Exit
 
@@ -307,7 +308,7 @@ FIQ_Keys
 	BNE quit_skip				;branch away if not
 
 	CMP r0, #0x71
-	BNE quit_skip
+	BEQ quit_skip
 
 	BL output_character
 
@@ -315,12 +316,14 @@ FIQ_Keys
 	BEQ key_enter
 
 	BL from_ascii
+	
+	MOV r0, #4
 
-	MUL r3, r5, #4
+	MUL r3, r5, r0
 
-	MOV r4, r4, r3
+	MOV r4, r4, LSL r3
 
-	ADD r8, r8, r4
+	ADD r10, r10, r4
 
 	B quit_skip
 
@@ -328,7 +331,12 @@ key_enter
 
 	MOV r5, #0
 
+	MOV r8, r10
 	
+	MOV r10, #0
+	
+	LDR r4, =test
+	BL output_string
 
 quit_skip
 

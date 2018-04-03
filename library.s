@@ -80,6 +80,9 @@ validate_input					;checks that the inputted value (r0) is either hexadecimal or
 
 	CMP r0, #0x71				;'q'
 	BEQ quit
+	
+	CMP r0, #0xD
+	BEQ vi_valid_number
 
 	CMP r9, #0				;not accepting input (bar 'q') when display is off
 	BEQ vi_invalid		
@@ -132,7 +135,7 @@ vi_exit
 get_digit					; returns (in r4) the hexadecimal number's (globally at r8) digit r0
 						; last-most digit is 0, first-most digit is n where n is number of steps needed to get to said digit
 						
-	STMFD SP!, {lr, r1, r2, r3}
+	STMFD SP!, {lr, r1, r2, r3, r5}
 
 	MOV r1, #0xF
 	MOV r2, r8
@@ -167,7 +170,7 @@ get_digit_0_loop
 
 get_digit_1
 
-	MOV r1, r1, #4
+	MOV r1, r1, LSL #4
 
 	AND r2, r2, r1
 
@@ -183,7 +186,7 @@ get_digit_1_loop
 
 get_digit_2
 
-	MOV r1, r1, #8
+	MOV r1, r1, LSL #8
 
 	AND r2, r2, r1
 
@@ -199,13 +202,15 @@ get_digit_2_loop
 
 get_digit_3
 
-	MOV r1, r1, #12
+	MOV r1, r1, LSL #12
 	
 	AND r2, r2, r1
 
 get_digit_3_loop
 
-	CMP r2, #0xFFF
+	LDR r5, =0xFFF
+
+	CMP r2, r5
 	BLE get_digit_end
 
 	ADD r3, r3, #1
@@ -217,7 +222,7 @@ get_digit_end
 
 	MOV r4, r3
 
-	LDMFD SP!, {lr, r1, r2, r3}
+	LDMFD SP!, {lr, r1, r2, r3, r5}
 	BX lr
 
 from_ascii					; converts (singe-digit) number at r0 from ascii number to normal number, returning at r4
@@ -346,7 +351,7 @@ read_character_2
 	; Receiving
 	
 	LDR r3, =0xE000C000		;loads the address of the receive buffer register into r5
-	LDR r0, [r3]			;hex value at r3 is loaded into r8
+	LDR r0, [r3]			;hex value at r3 is loaded into r0
 read_character_break
 	LDMFD sp!, {lr, r3, r4, r5}
 	BX lr
@@ -395,8 +400,6 @@ new_line
 	MOV r0, #0xD				;carriage return copied into r0
 	BL output_character			;branch and link to output character
 	MOV r0, r10					;takes saved content from r10 and copies into r0
-	;CMP r8, #0xD				;checks if r8 has  carriage return and jumps to clear it
-	;BEQ clear_read_character
 	LDMFD sp!, {lr, r10}
 	BX lr	 
 
