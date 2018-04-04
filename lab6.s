@@ -14,11 +14,14 @@
 	EXTERN read_character
 	EXTERN output_character
 	EXTERN output_string
+	EXTERN new_line
 
 	EXTERN change_display_digit
 	EXTERN get_digit
 
 	EXTERN from_ascii
+		
+	EXTERN store_input
 
 prompt = "Press momentary push button to toggle seven segment display on or off. Enter four hexadecimal numbers, followed by [Enter], to change the display (if it is on). Press 'q' to exit program.",0
 test = "test1",0
@@ -174,13 +177,13 @@ interrupt_init
 
 FIQ_Handler
 
-		STMFD SP!, {r0, r1, r2, r3, r4, lr}   ; Save registers 
+	STMFD SP!, {r0, r1, r2, r3, r4, lr}   ; Save registers
 		
-		LDR r0, =0xE0004000
-		LDR r1, [r0]
-		CMP r1, #0
-		BGT TIMER0
-		B EINT1
+	LDR r0, =0xE0004000
+	LDR r1, [r0]
+	CMP r1, #0
+	BGT TIMER0
+	B EINT1
 		
 TIMER0
 
@@ -315,15 +318,7 @@ FIQ_Keys
 	CMP r0, #0xD
 	BEQ key_enter
 
-	BL from_ascii
-	
-	MOV r0, #4
-
-	MUL r3, r5, r0
-
-	MOV r4, r4, LSL r3
-
-	ADD r10, r10, r4
+	BL store_input
 
 	B quit_skip
 
@@ -334,6 +329,8 @@ key_enter
 	MOV r8, r10
 	
 	MOV r10, #0
+	
+	BL new_line
 	
 	LDR r4, =test
 	BL output_string

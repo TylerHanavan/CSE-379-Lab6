@@ -7,6 +7,7 @@
 	EXPORT read_character
 	EXPORT output_character
 	EXPORT output_string
+	EXPORT new_line
 	EXPORT clear_display
 	EXPORT change_display
 
@@ -14,8 +15,12 @@
 	EXPORT get_digit
 
 	EXPORT from_ascii
+		
+	EXPORT store_input
 
 test = "test1",0
+input = "    ",0
+in_count = "0",0
 	ALIGN
 		
 digits_SET   
@@ -90,28 +95,16 @@ validate_input					;checks that the inputted value (r0) is either hexadecimal or
 	CMP r0, #0x30				;<0x30 invalid
 	BLT vi_invalid
 
-	CMP r0, #0x66				;>0x66 invalid
+	CMP r0, #0x46				;>0x66 invalid
 	BGT vi_invalid
 
 	CMP r0, #0x39				;<=0x39 valid number
 	BLE vi_valid_number
 	
-	CMP r0, #0x61				;>=0x61 valid uppercase letter
-	BGE vi_valid_letter_upper
-
-	CMP r0, #0x46				;>0x46 invalid
-	BGT vi_invalid
-	
 	CMP r0, #0x41				;>=0x41 valid uppercase letter
 	BGE vi_valid_letter_upper
 	
 vi_valid_number
-
-	MOV r4, #1				;return 1 for r4
-
-	B vi_exit
-
-vi_valid_letter_lower
 
 	MOV r4, #1				;return 1 for r4
 
@@ -231,23 +224,18 @@ from_ascii					; converts (singe-digit) number at r0 from ascii number to normal
 	CMP r0, #0x39
 	BLE fa_number
 
-	CMP r0, #0x61
-	BGE fa_lower
-
-	CMP r0, #0x41
-	BGE fa_upper
+	B fa_upper
 
 fa_number
 
 	SUB r4, r0, #0x30
+	
+	B fa_exit
 
 fa_upper
 	
-	SUB r4, r0, #54
-
-fa_lower
-
-	SUB r4, r0, #86
+	SUB r4, r0, #0x41
+	ADD r4, r4, #10
 
 fa_exit
 
@@ -345,8 +333,8 @@ read_character_2
 	MOV r5, #1			;immediate value 1 is copied into r5
 	AND r5, r4, r5			;logically AND r4 and r5 to compare the LSB(RDR) of r4
 	
-	CMP r5, #1			;if the value of r5 is one, we are ready to receive data
-	BNE read_character_2		;else redo the process
+	;CMP r5, #1			;if the value of r5 is one, we are ready to receive data
+	;BNE read_character_2		;else redo the process
 	
 	; Receiving
 	
@@ -402,6 +390,57 @@ new_line
 	MOV r0, r10					;takes saved content from r10 and copies into r0
 	LDMFD sp!, {lr, r10}
 	BX lr	 
+	
+store_input
+	STMFD SP!, {lr, r1-r5}
+
+	; IN r0 - contents of key pressed
+
+	MOV r3, r0
+
+	LDR r0, =in_count			; Load in_count address
+	BL from_mem					; Get value of in_count
+	
+	MOV r0, r1
+	BL from_ascii
+	
+	MOV r1, r4
+
+	LDR r0, =input				; Load input address
+	ADD r0, r0, r1				; Pre-increment r0 (address) by r1 (# of elements). 
+	
+	MOV r4, r1
+	
+	MOV r1, r3
+	
+	BL to_mem
+	
+	LDR r0, =in_count
+	MOV r1, r4
+	ADD r1, r1, #1
+	
+	BL to_mem
+
+	LDMFD SP!, {lr, r1-r5}
+	BX lr
+	
+to_mem								;r0 - memory address, r1 - contents
+	STMFD SP!, {lr, r2-r5}
+	
+	STRB r1, [r0]
+	
+	LDMFD SP!, {lr, r2-r5}
+	BX lr
+	
+from_mem								;r0 - memory address, return contents - r1
+	STMFD SP!, {lr, r2-r5}
+	
+	LDRB r1, [r0]
+	
+	LDMFD SP!, {lr, r2-r5}
+	BX lr
+	
+	
 
 quit
 	MOV r7, #5
