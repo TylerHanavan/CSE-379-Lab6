@@ -22,9 +22,15 @@
 	EXTERN from_ascii
 		
 	EXTERN store_input
+	EXTERN get_input
+	EXTERN clear_input
 
 prompt = "Press momentary push button to toggle seven segment display on or off. Enter four hexadecimal numbers, followed by [Enter], to change the display (if it is on). Press 'q' to exit program.",0
-test = "test1",0
+char1 = "Char 1 is: ",0
+char2 = "Char 2 is: ",0
+char3 = "Char 3 is: ",0
+char4 = "Char 4 is: ",0
+displaying = "Displaying: ",0
     ALIGN
 
 lab6	 	
@@ -63,8 +69,6 @@ lab6_end
 interrupt_init       
 
 		STMFD SP!, {r0-r2, lr}   ; Save registers 
-
-		
 
 		; Push button setup		 
 
@@ -210,14 +214,22 @@ TIMER0
 	B FIQ_Exit
 	
 cycle_1
+	
+	;LDR r0, =displaying
+	;BL output_string
 
 	BL clear_display
 
 	MOV r0, #0
-	BL get_digit
+	BL get_input
+	
+	BL from_ascii
+	
+	;BL output_character
 
-	MOV r4, r0
-	MOV r0, #1
+	MOV r0, r4
+	
+	MOV r4, #0
 
 	BL change_display_digit
 
@@ -230,10 +242,15 @@ cycle_2
 	BL clear_display
 
 	MOV r0, #1
-	BL get_digit
+	BL get_input
+	
+	BL from_ascii
+	
+	;BL output_character
 
-	MOV r4, r0
-	MOV r0, #1
+	MOV r0, r4
+	
+	MOV r4, #1
 
 	BL change_display_digit
 
@@ -246,10 +263,15 @@ cycle_3
 	BL clear_display
 
 	MOV r0, #2
-	BL get_digit
+	BL get_input
+	
+	BL from_ascii
+	
+	;BL output_character
 
-	MOV r4, r0
-	MOV r0, #2
+	MOV r0, r4
+	
+	MOV r4, #2
 
 	BL change_display_digit
 
@@ -262,10 +284,15 @@ cycle_4
 	BL clear_display
 
 	MOV r0, #3
-	BL get_digit
+	BL get_input
+	
+	BL from_ascii
+	
+	;BL output_character
 
-	MOV r4, r0
-	MOV r0, #3
+	MOV r0, r4
+	
+	MOV r4, #3
 
 	BL change_display_digit
 
@@ -323,21 +350,64 @@ FIQ_Keys
 	B quit_skip
 
 key_enter
-
-	MOV r5, #0
-
-	MOV r8, r10
-	
-	MOV r10, #0
 	
 	BL new_line
 	
-	LDR r4, =test
+	LDR r4, =char1
 	BL output_string
+	
+	MOV r0, #0
+	
+	BL get_input
+	
+	BL output_character
+	
+	BL new_line
+	
+	LDR r4, =char2
+	BL output_string
+	
+	MOV r0, #1
+	
+	BL get_input
+	
+	BL output_character
+	
+	BL new_line
+	
+	LDR r4, =char3
+	BL output_string
+	
+	MOV r0, #2
+	
+	BL get_input
+	
+	BL output_character
+	
+	BL new_line
+	
+	LDR r4, =char4
+	BL output_string
+	
+	MOV r0, #3
+	
+	BL get_input
+	
+	BL output_character
+	
+	BL new_line
+	
+	BL clear_input
 
 quit_skip
 
 FIQ_Exit
+
+		LDR r0, =0xE0004000
+		LDR r1, [r0]
+
+		BIC r1, r1, #1
+		STR r1, [r0]
 
 		LDMFD SP!, {r0, r1, r2, r3, r4, lr}
 

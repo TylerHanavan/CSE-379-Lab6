@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\lab6.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\lab6.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Apr 04 18:48:17 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Thu Apr 05 13:46:20 2018
 <BR><P>
 <H3>Maximum Stack Usage =          8 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -19,18 +19,20 @@ Functions with no stack information
  <LI><a href="#[1e]">uart_init</a>
  <LI><a href="#[1f]">pin_connect_block_setup_for_uart0</a>
  <LI><a href="#[20]">setup_pins</a>
- <LI><a href="#[27]">validate_input</a>
- <LI><a href="#[23]">get_digit</a>
- <LI><a href="#[2c]">from_ascii</a>
- <LI><a href="#[25]">toggle_seven_seg</a>
- <LI><a href="#[2b]">change_display</a>
- <LI><a href="#[24]">change_display_digit</a>
+ <LI><a href="#[28]">validate_input</a>
+ <LI><a href="#[59]">get_digit</a>
+ <LI><a href="#[24]">from_ascii</a>
+ <LI><a href="#[26]">toggle_seven_seg</a>
+ <LI><a href="#[5a]">change_display</a>
+ <LI><a href="#[25]">change_display_digit</a>
  <LI><a href="#[21]">clear_display</a>
- <LI><a href="#[26]">read_character</a>
- <LI><a href="#[28]">output_character</a>
+ <LI><a href="#[27]">read_character</a>
+ <LI><a href="#[29]">output_character</a>
  <LI><a href="#[22]">output_string</a>
- <LI><a href="#[2a]">new_line</a>
- <LI><a href="#[29]">store_input</a>
+ <LI><a href="#[2b]">new_line</a>
+ <LI><a href="#[2c]">clear_input</a>
+ <LI><a href="#[2a]">store_input</a>
+ <LI><a href="#[23]">get_input</a>
  <LI><a href="#[3]">Undef_Handler</a>
  <LI><a href="#[4]">SWI_Handler</a>
  <LI><a href="#[5]">PAbt_Handler</a>
@@ -263,16 +265,18 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[8]"></a>FIQ_Handler</STRONG> (ARM, 0 bytes, Stack size unknown bytes, lab6.o(interrupts))
-<BR><BR>[Calls]<UL><LI><a href="#[27]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;validate_input
-<LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
-<LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_input
-<LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_character
+<BR><BR>[Calls]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;validate_input
+<LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
+<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_input
+<LI><a href="#[27]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_character
 <LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_string
-<LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
-<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
-<LI><a href="#[23]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_digit
+<LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
+<LI><a href="#[23]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_input
+<LI><a href="#[24]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;from_ascii
+<LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_input
 <LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_display
-<LI><a href="#[24]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;change_display_digit
+<LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;change_display_digit
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
@@ -288,68 +292,74 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lab6
 </UL>
 
-<P><STRONG><a name="[27]"></a>validate_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<P><STRONG><a name="[28]"></a>validate_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
 <BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[23]"></a>get_digit</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
+<P><STRONG><a name="[59]"></a>get_digit</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library), UNUSED)
+
+<P><STRONG><a name="[24]"></a>from_ascii</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Called By]<UL><LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_input
+<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[2c]"></a>from_ascii</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Called By]<UL><LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_input
-</UL>
-
-<P><STRONG><a name="[25]"></a>toggle_seven_seg</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Calls]<UL><LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;change_display
+<P><STRONG><a name="[26]"></a>toggle_seven_seg</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Calls]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_string
 <LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_display
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[2b]"></a>change_display</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Called By]<UL><LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
-</UL>
+<P><STRONG><a name="[5a]"></a>change_display</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library), UNUSED)
 
-<P><STRONG><a name="[24]"></a>change_display_digit</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<P><STRONG><a name="[25]"></a>change_display_digit</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
 <BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
 <P><STRONG><a name="[21]"></a>clear_display</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Called By]<UL><LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
+<BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
 <LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lab6
 <LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[26]"></a>read_character</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<P><STRONG><a name="[27]"></a>read_character</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
 <BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[28]"></a>output_character</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<P><STRONG><a name="[29]"></a>output_character</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
 <BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_string
-<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
 <LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
 <P><STRONG><a name="[22]"></a>output_string</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Calls]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
-<LI><a href="#[2a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
+<BR><BR>[Calls]<UL><LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;new_line
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lab6
+<BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toggle_seven_seg
+<LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lab6
 <LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[2a]"></a>new_line</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Calls]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
+<P><STRONG><a name="[2b]"></a>new_line</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Calls]<UL><LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_character
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output_string
 <LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 
-<P><STRONG><a name="[29]"></a>store_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
-<BR><BR>[Calls]<UL><LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;from_ascii
+<P><STRONG><a name="[2c]"></a>clear_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
+</UL>
+
+<P><STRONG><a name="[2a]"></a>store_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Calls]<UL><LI><a href="#[24]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;from_ascii
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
+</UL>
+
+<P><STRONG><a name="[23]"></a>get_input</STRONG> (ARM, 0 bytes, Stack size unknown bytes, library.o(library))
+<BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FIQ_Handler
 </UL>
 <P>
 <H3>

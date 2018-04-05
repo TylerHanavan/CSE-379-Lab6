@@ -140,32 +140,15 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2ARM</Key>
-          <Name>-UV0060BME -O7 -S0 -C0 -N00("ARM7TDMI-S Core") -D00(4F1F0F0F) -L00(4) -FO15 -FD40000000 -FC800 -FN1 -FF0LPC_IAP2_512 -FS00 -FL07D000</Name>
+          <Name>-UV1262BME -O7 -S0 -C0 -N00("ARM7TDMI-S Core") -D00(4F1F0F0F) -L00(4) -FO15 -FD40000000 -FC800 -FN1 -FF0LPC_IAP2_512 -FS00 -FL07D000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>395</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>1073743460</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\library.s</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <MemoryWindow2>
         <Mm>
           <WinNumber>2</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0x40000332</ItemText>
+          <ItemText>0x4000036B</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow2>

@@ -17,11 +17,13 @@
 	EXPORT from_ascii
 		
 	EXPORT store_input
+	EXPORT get_input
+	EXPORT clear_input
 
-test = "test1",0
 input = "    ",0
 in_count = "0",0
-	ALIGN
+seg_on = "Seven segment display turned on",0
+seg_off = "Seven segment display turned off",0
 		
 digits_SET   
     DCD 0x00003780  ; 0 
@@ -89,8 +91,8 @@ validate_input					;checks that the inputted value (r0) is either hexadecimal or
 	CMP r0, #0xD
 	BEQ vi_valid_number
 
-	CMP r9, #0				;not accepting input (bar 'q') when display is off
-	BEQ vi_invalid		
+;	CMP r9, #0				;not accepting input (bar 'q') when display is off
+;	BEQ vi_invalid		
 
 	CMP r0, #0x30				;<0x30 invalid
 	BLT vi_invalid
@@ -254,7 +256,10 @@ tss_on
 
 	MOV r0, r6
 
-	BL change_display			;change display
+;	BL change_display			;change display
+
+	LDR r0, =seg_on
+	BL output_string
 
 	B tss_exit 
 
@@ -262,6 +267,9 @@ tss_off
 	
 	MOV r9, #0				;set the flag to #0 (r9) to say seven seg is off
 	BL clear_display			;clear (turn off) display
+
+	LDR r0, =seg_off
+	BL output_string
 
 tss_exit
 
@@ -286,26 +294,54 @@ change_display				;Displays hex value passed in r0
 change_display_digit			;Displays hex value passed in r0 at digit r4
 	STMFD SP!,{lr, r1, r2, r3, r5}
 	
+	MOV r5, #0xF					;mask
+	MOV r5, r5, LSL #2
+	
+	CMP r4, #0
+	BEQ mask_0
+	
+	CMP r4, #1
+	BEQ mask_1
+	
+	CMP r4, #2
+	BEQ mask_2
+	
+	CMP r4, #3
+	BEQ mask_3
+	
+mask_0
+
+	BIC r5, r5, #4
+	
+	B mask_done
+
+mask_1
+
+	BIC r5, r5, #8
+	
+	B mask_done
+
+mask_2
+
+	BIC r5, r5, #0x10
+	
+	B mask_done
+
+mask_3
+
+	BIC r5, r5, #0x20
+	
+	B mask_done
+
+mask_done
+	
 	MOV r9, #1
-	MOV r6, r0			; Save our r0 at r6
-	
-	MOV r5, #1			; Initial 1 for selecting which pin to HIGH
-
-	ADD r4, #0x2			; DIGIT SEL IS OFFSET BY 2. BEGINS AT PIN 2. r4 + 2 is pin that gets HIGH'd
-	
-	MOV r5, r5, LSL r4		; Shift initial 1 bit by r4
-
-	MVN r5, r5			; High all bits besides r4 (DIGIT SEL IS OFFSET BY 2. BEGINS AT PIN 2. 0 & 1 RESERVED)
-	;ADD r5, r5, #1
-
-	AND r5, r5, #0x3C		; Clear all bits (AND) besides 6 bits in 0x3C. Will be used in later OR
-
-	LDR r1, =0xE0028000 		; Base address for 7seg
+	LDR r1, =0xE0028000 		; Base address 
 	LDR r3, =digits_SET 
 	MOV r0, r0, LSL #2 		; Each stored value is 32 bits 
-	ADD r3, r0
-	LDR r2, [r3] 	  		; Load IOSET pattern for digit in r0 
-	ORR r2, r2, r5			; HIGH bits not being used (HIGH-OFF TO CHOOSE DIGIT)
+	LDR r2, [r3, r0]   		; Load IOSET pattern for digit in r0 
+	;MOV r5, r5, LSL #2
+	ORR r2, r2, r5
 	STR r2, [r1, #4]   		; Display (0x4 = offset to IOSET) 
 
 	LDMFD sp!, {lr, r1, r2, r3, r5}
@@ -314,10 +350,8 @@ change_display_digit			;Displays hex value passed in r0 at digit r4
 clear_display
 	STMFD SP!,{lr, r1, r2}
 	
-	MOV r9, #0
-	
 	LDR r1, =0xE002800C							;Load P0xCLR to r1
-	LDR r2, =0xB784								;Load number (to r2) for bits of seven-segment display
+	LDR r2, =0xB7BC								;Load number (to r2) for bits of seven-segment display
 	STR r2, [r1]								;Store number in P0xClr at r1
 	
 	LDMFD sp!, {lr, r1, r2}
@@ -391,6 +425,16 @@ new_line
 	LDMFD sp!, {lr, r10}
 	BX lr	 
 	
+clear_input
+	STMFD SP!, {lr, r1-r5}
+	
+	LDR r0, =in_count			; Load in_count address
+	MOV r1, #0x30
+	BL to_mem
+	
+	LDMFD SP!, {lr, r1-r5}
+	BX lr
+	
 store_input
 	STMFD SP!, {lr, r1-r5}
 
@@ -417,9 +461,33 @@ store_input
 	
 	LDR r0, =in_count
 	MOV r1, r4
+	ADD r1, r1, #0x30
 	ADD r1, r1, #1
 	
 	BL to_mem
+
+	LDMFD SP!, {lr, r1-r5}
+	BX lr
+	
+get_input						;Return char in memory at r0 (0 for 1st; 3 for 4th)
+	STMFD SP!, {lr, r1-r5}
+
+	MOV r2, r0					;Which char -> r2
+
+	LDR r0, =input
+	ADD r0, r0, r2				;increment address by r2
+	BL from_mem
+	
+	CMP r1, #0x30
+	BLT gi_fix
+	
+	B gi_end
+	
+gi_fix
+	MOV r1, #0x30
+	
+gi_end
+	MOV r0, r1
 
 	LDMFD SP!, {lr, r1-r5}
 	BX lr
