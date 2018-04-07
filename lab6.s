@@ -60,6 +60,8 @@ lab6_loop
 
 lab6_end
 
+	BL clear_display
+	
 	LDMFD sp!,{lr}
 
 	BX lr
@@ -135,7 +137,7 @@ interrupt_init
 
 		LDR r0, =0xE0004018
 
-		LDR r1, =160000
+		LDR r1, =110000
 
 		STR r1, [r0]
 
@@ -195,6 +197,7 @@ TIMER0
 	STR r1, [r0]
 	
 	;r8 contains value to display
+	
 	
 	CMP r9, #1
 	BNE FIQ_Exit
@@ -346,7 +349,7 @@ FIQ_Keys
 	BEQ key_enter
 
 	BL store_input
-
+	
 	B quit_skip
 
 key_enter

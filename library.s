@@ -12,7 +12,6 @@
 	EXPORT change_display
 
 	EXPORT change_display_digit
-	EXPORT get_digit
 
 	EXPORT from_ascii
 		
@@ -127,99 +126,6 @@ vi_exit
 	LDMFD SP!, {lr, r1, r2, r3}
 	BX lr
 
-get_digit					; returns (in r4) the hexadecimal number's (globally at r8) digit r0
-						; last-most digit is 0, first-most digit is n where n is number of steps needed to get to said digit
-						
-	STMFD SP!, {lr, r1, r2, r3, r5}
-
-	MOV r1, #0xF
-	MOV r2, r8
-	MOV r3, #0
-
-	CMP r0, #0
-	BEQ get_digit_0
-
-	CMP r0, #1
-	BEQ get_digit_1
-
-	CMP r0, #2
-	BEQ get_digit_2
-
-	CMP r0, #3
-	BEQ get_digit_3
-
-get_digit_0
-	
-	AND r2, r2, r1	
-
-get_digit_0_loop
-	
-	CMP r2, #0
-	BEQ get_digit_end
-
-	ADD r3, r3, #1
-	SUB r2, r2, #1
-	
-	B get_digit_0_loop
-
-
-get_digit_1
-
-	MOV r1, r1, LSL #4
-
-	AND r2, r2, r1
-
-get_digit_1_loop
-
-	CMP r2, #0xF
-	BLE get_digit_end
-
-	ADD r3, r3, #1
-	SUB r2, r2, #0x10
-	
-	B get_digit_0_loop
-
-get_digit_2
-
-	MOV r1, r1, LSL #8
-
-	AND r2, r2, r1
-
-get_digit_2_loop
-
-	CMP r2, #0xFF
-	BLE get_digit_end
-
-	ADD r3, r3, #1
-	SUB r2, r2, #0x100
-
-	B get_digit_2_loop
-
-get_digit_3
-
-	MOV r1, r1, LSL #12
-	
-	AND r2, r2, r1
-
-get_digit_3_loop
-
-	LDR r5, =0xFFF
-
-	CMP r2, r5
-	BLE get_digit_end
-
-	ADD r3, r3, #1
-	SUB r2, r2, #0x1000
-
-	B get_digit_3_loop
-
-get_digit_end
-
-	MOV r4, r3
-
-	LDMFD SP!, {lr, r1, r2, r3, r5}
-	BX lr
-
 from_ascii					; converts (singe-digit) number at r0 from ascii number to normal number, returning at r4
 	STMFD SP!, {lr, r1, r2, r3}
 
@@ -312,37 +218,53 @@ change_display_digit			;Displays hex value passed in r0 at digit r4
 mask_0
 
 	BIC r5, r5, #4
+	LDR r1, =0xE0028008
+    LDR r2, [r1]
+	ORR r2, r2, r5
+	STR r2, [r1]
 	
 	B mask_done
 
 mask_1
 
 	BIC r5, r5, #8
+	LDR r1, =0xE0028008
+    LDR r2, [r1]
+	ORR r2, r2, r5
+	STR r2, [r1]
 	
 	B mask_done
 
 mask_2
 
 	BIC r5, r5, #0x10
+	LDR r1, =0xE0028008
+    LDR r2, [r1]
+	ORR r2, r2, r5
+	STR r2, [r1]
 	
 	B mask_done
 
 mask_3
 
 	BIC r5, r5, #0x20
+	LDR r1, =0xE0028008
+    LDR r2, [r1]
+	ORR r2, r2, r5	
+	STR r2, [r1]
 	
 	B mask_done
 
 mask_done
 	
 	MOV r9, #1
-	LDR r1, =0xE0028000 		; Base address 
+	LDR r1, =0xE0028004		; Base address 
 	LDR r3, =digits_SET 
 	MOV r0, r0, LSL #2 		; Each stored value is 32 bits 
 	LDR r2, [r3, r0]   		; Load IOSET pattern for digit in r0 
 	;MOV r5, r5, LSL #2
 	ORR r2, r2, r5
-	STR r2, [r1, #4]   		; Display (0x4 = offset to IOSET) 
+	STR r2, [r1]   		; Display (0x4 = offset to IOSET) 
 
 	LDMFD sp!, {lr, r1, r2, r3, r5}
 	BX lr
