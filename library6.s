@@ -1,4 +1,4 @@
-	AREA library, CODE, READWRITE
+	AREA library6, CODE, READWRITE
 	EXPORT uart_init
 	EXPORT pin_connect_block_setup_for_uart0
 	EXPORT setup_pins
@@ -9,7 +9,6 @@
 	EXPORT output_string
 	EXPORT new_line
 	EXPORT clear_display
-	EXPORT change_display
 
 	EXPORT change_display_digit
 
@@ -162,10 +161,6 @@ tss_on
 
 	MOV r0, r6
 
-;	BL change_display			;change display
-
-	LDR r0, =seg_on
-	BL output_string
 
 	B tss_exit 
 
@@ -174,27 +169,9 @@ tss_off
 	MOV r9, #0				;set the flag to #0 (r9) to say seven seg is off
 	BL clear_display			;clear (turn off) display
 
-	LDR r0, =seg_off
-	BL output_string
-
 tss_exit
 
 	LDMFD SP!, {lr, r0}
-	BX lr
-
-change_display				;Displays hex value passed in r0
-	STMFD SP!,{lr, r1, r2, r3}
-	
-	MOV r9, #1
-	MOV r6, r0
-
-	LDR r1, =0xE0028000 		; Base address 
-	LDR r3, =digits_SET 
-	MOV r0, r0, LSL #2 		; Each stored value is 32 bits 
-	LDR r2, [r3, r0]   		; Load IOSET pattern for digit in r0 
-	STR r2, [r1, #4]   		; Display (0x4 = offset to IOSET) 
-
-	LDMFD sp!, {lr, r1, r2, r3}
 	BX lr
 
 change_display_digit			;Displays hex value passed in r0 at digit r4
@@ -433,5 +410,6 @@ from_mem								;r0 - memory address, return contents - r1
 	
 
 quit
+	BL toggle_seven_seg
 	MOV r7, #5
 	END

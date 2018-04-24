@@ -435,9 +435,9 @@
               <FilePath>.\lab6.s</FilePath>
             </File>
             <File>
-              <FileName>library.s</FileName>
+              <FileName>library6.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\library.s</FilePath>
+              <FilePath>.\library6.s</FilePath>
             </File>
           </Files>
         </Group>

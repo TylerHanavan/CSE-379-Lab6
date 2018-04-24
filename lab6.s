@@ -8,7 +8,6 @@
 	EXTERN pin_connect_block_setup_for_uart0
 	EXTERN setup_pins
 	EXTERN validate_input
-	EXTERN change_display
 	EXTERN clear_display
 	EXTERN toggle_seven_seg
 	EXTERN read_character
@@ -25,7 +24,7 @@
 	EXTERN get_input
 	EXTERN clear_input
 
-prompt = "Press momentary push button to toggle seven segment display on or off. Enter four hexadecimal numbers, followed by [Enter], to change the display (if it is on). Press 'q' to exit program.",0
+prompt = "Press momentary push button to toggle seven segment display on or off. Enter four hexadecimal numbers (1-9 and CAPITAL letters A-F), followed by [Enter], to change the display (if it is on). Press 'q' to exit program.",0
 char1 = "Char 1 is: ",0
 char2 = "Char 2 is: ",0
 char3 = "Char 3 is: ",0
@@ -59,8 +58,6 @@ lab6_loop
 	B lab6_loop
 
 lab6_end
-
-	BL clear_display
 	
 	LDMFD sp!,{lr}
 
@@ -218,22 +215,19 @@ TIMER0
 	
 cycle_1
 	
-	;LDR r0, =displaying
-	;BL output_string
 
-	BL clear_display
+	
 
 	MOV r0, #0
 	BL get_input
 	
 	BL from_ascii
 	
-	;BL output_character
-
 	MOV r0, r4
 	
 	MOV r4, #0
-
+	
+	BL clear_display
 	BL change_display_digit
 
 	ADD r7, r7, #1
@@ -242,19 +236,18 @@ cycle_1
 
 cycle_2
 
-	BL clear_display
+	
 
 	MOV r0, #1
 	BL get_input
 	
 	BL from_ascii
-	
-	;BL output_character
 
 	MOV r0, r4
 	
 	MOV r4, #1
-
+	
+	BL clear_display
 	BL change_display_digit
 
 	ADD r7, r7, #1
@@ -263,19 +256,17 @@ cycle_2
 
 cycle_3
 	
-	BL clear_display
 
 	MOV r0, #2
 	BL get_input
 	
 	BL from_ascii
 	
-	;BL output_character
-
 	MOV r0, r4
 	
 	MOV r4, #2
 
+	BL clear_display
 	BL change_display_digit
 
 	ADD r7, r7, #1
@@ -284,19 +275,19 @@ cycle_3
 
 cycle_4
 
-	BL clear_display
+
 
 	MOV r0, #3
 	BL get_input
 	
 	BL from_ascii
 	
-	;BL output_character
 
 	MOV r0, r4
 	
 	MOV r4, #3
 
+	BL clear_display
 	BL change_display_digit
 
 	MOV r7, #0
@@ -323,7 +314,7 @@ EINT1			; Check for EINT1 interrupt
 	B FIQ_Exit
 
 FIQ_Keys
-
+	
 	LDR r0, =0xE000C008
 
 	LDR r1, [r0]
@@ -331,7 +322,7 @@ FIQ_Keys
 	AND r2, r1, #1
 
 	CMP r2, #0
-
+	
 	BNE FIQ_Exit
 
 	BL read_character
@@ -356,9 +347,7 @@ key_enter
 	
 	BL new_line
 	
-	LDR r4, =char1
-	BL output_string
-	
+
 	MOV r0, #0
 	
 	BL get_input
@@ -367,8 +356,6 @@ key_enter
 	
 	BL new_line
 	
-	LDR r4, =char2
-	BL output_string
 	
 	MOV r0, #1
 	
@@ -378,8 +365,7 @@ key_enter
 	
 	BL new_line
 	
-	LDR r4, =char3
-	BL output_string
+
 	
 	MOV r0, #2
 	
@@ -389,8 +375,7 @@ key_enter
 	
 	BL new_line
 	
-	LDR r4, =char4
-	BL output_string
+
 	
 	MOV r0, #3
 	
@@ -401,6 +386,7 @@ key_enter
 	BL new_line
 	
 	BL clear_input
+	
 
 quit_skip
 
